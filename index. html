@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SKYARCADE PRO 3D - Poki & CrazyGames Style Portal</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            background-color: #0c0f1d;
+            color: #ffffff;
+            overflow-x: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(18, 22, 41, 0.95);
+            border-bottom: 2px solid #2a3459;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            font-size: 28px;
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+        .logo-text span {
+            font-size: 10px;
+            background: #ff0055;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .portal-stats {
+            display: flex;
+            gap: 15px;
+            background: #1a2238;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #32416b;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .portal-stats span {
+            color: #00ff87;
+        }
+        .hero-banner {
+            margin: 20px;
+            background: linear-gradient(135deg, #1b2845 0%, #270d3d 100%);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #4a2875;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-banner h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-banner p {
+            font-size: 13px;
+            color: #b8c1ec;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        .hero-btn {
+            background: linear-gradient(90deg, #00ff87, #60efff);
+            color: #0c0f1d;
+            border: none;
+            padding: 12px 25px;
+            font-weight: 800;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 255, 135, 0.4);
+            transition: 0.2s;
+        }
+        .hero-btn:active {
+            transform: scale(0.95);
+        }
+        .section-title {
+            margin: 25px 20px 15px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 0 20px 40px;
+        }
+        .game-card {
+            background: #161b33;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #263159;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .game-card:active {
+            transform: scale(0.98);
+        }
+        .game-thumb {
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 12px;
+        }
+        .game-thumb.cricket {
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=600&q=80');
+        }
+        .game-thumb.football {
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80');
+        }
+        .game-thumb.basketball {
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80');
+        }
+        .game-tag {
+            background: rgba(0, 0, 0, 0.7);
+            color: #00ff87;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid #00ff87;
+        }
+        .game-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .game-info h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+        .game-info p {
+            font-size: 12px;
+            color: #8f9bb3;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        .play-btn {
+            background: #ff0055;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 0, 85, 0.3);
+        }
+        /* Game Modal / Screen */
+        #game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: #111625;
+            border-bottom: 1px solid #222c4a;
+        }
+        .modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ff87;
+        }
+        .close-btn {
+            background: #ff3838;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #canvas-container {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1b4d3e 0%, #081c15 100%);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .game-hud {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .hud-box {
+            background: rgba(0,0,0,0.6);
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .controls-overlay {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+            pointer-events: auto;
+        }
+        .action-btn {
+            background: linear-gradient(135deg, #00ff87, #00b0ff);
+            color: #0c0f1d;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 900;
+            border-radius: 35px;
+            box-shadow: 0 6px 20px rgba(0,255,135,0.4);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .action-btn:active {
+            transform: scale(0.92);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">
+                <h1>SKYARCADE 3D</h1>
+                <span>PRO POKI EDITION</span>
+            </div>
+        </div>
+        <div class="portal-stats">
+            Score: <span id="portal-score">0</span>
+        </div>
+    </header>
+
+    <div class="hero-banner">
+        <h2>Realistic 3D Sports Arena</h2>
+        <p>Experience ultra-realistic browser-based 3D games featuring fully rigged human characters, fluid cloth physics, and instant action with zero downloads!</p>
+        <button class="hero-btn" onclick="launchGame('cricket')">Play Featured Cricket 3D</button>
+    </div>
+
+    <div class="section-title">🔥 Trending 3D Simulators</div>
+
+    <div class="games-grid">
+        <!-- Cricket Game Card -->
+        <div class="game-card">
+            <div class="game-thumb cricket">
+                <span class="game-tag">3D SPORTS</span>
+            </div>
+            <div class="game-info">
+                <div>
+                    <h3>3D Pro Cricket Championship</h3>
+                    <p>Realistic stadium environment, 3D batsman & bowler physics, lofted shots and power hitting.</p>
+                </div>
+                <button class="play-btn" onclick="launchGame('cricket')">Launch Game</button>
+            </div>
+        </div>
+
+        <!-- Football Game Card -->
+        <div class="game-card">
+            <div class="game-thumb football">
+                <span class="game-tag">3D STRIKER</span>
+            </div>
+            <div class="game-info">
+                <div>
+                    <h3>3D Penalty & Freekick</h3>
+                    <p>Advanced goalkeeper AI, curve shots, stadium crowd effects and realistic ball physics.</p>
+                </div>
+                <button class="play-btn" onclick="launchGame('football')">Launch Game</button>
+            </div>
+        </div>
+
+        <!-- Basketball Game Card -->
+        <div class="game-card">
+            <div class="game-thumb basketball">
+                <span class="game-tag">3D HOOPS</span>
+            </div>
+            <div class="game-info">
+                <div>
+                    <h3>3D Basketball Star</h3>
+                    <p>Smooth jump shots, arcade rim physics and high-score challenge modes.</p>
+                </div>
+                <button class="play-btn" onclick="launchGame('basketball')">Launch Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Game Modal with 3D Engine -->
+    <div id="game-modal">
+        <div class="modal-header">
+            <span class="modal-title" id="modal-game-title">3D Simulator</span>
+            <button class="close-btn" onclick="closeGame()">✕ Exit</button>
+        </div>
+        <div id="canvas-container">
+            <div class="game-hud">
+                <div class="hud-box">SCORE: <span id="game-score">0</span></div>
+                <div class="hud-box" id="game-status">READY</div>
+            </div>
+            <div class="controls-overlay" id="game-controls">
+                <button class="action-btn" id="primary-action-btn" onclick="triggerAction()">SWING / SHOOT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js Library CDN for High-End 3D Graphics & Realistic Human Characters -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, animationFrameId;
+        let currentGame = null;
+        let score = 0;
+        let portalScore = 0;
+        
+        // Game objects
+        let batsman, ball, bat, pitch, stumps;
+        let isPlayingAction = false;
+        let ballState = 'idle'; // idle, bowling, batting, missed, scored
+
+        function launchGame(type) {
+            currentGame = type;
+            document.getElementById('game-modal').style.display = 'flex';
+            document.getElementById('modal-game-title').innerText = type === 'cricket' ? '3D Pro Cricket Championship' : (type === 'football' ? '3D Penalty Shootout' : '3D Basketball Star');
+            init3DScene(type);
+        }
+
+        function closeGame() {
+            document.getElementById('game-modal').style.display = 'none';
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            const container = document.getElementById('canvas-container');
+            const oldCanvas = container.querySelector('canvas');
+            if (oldCanvas) container.removeChild(oldCanvas);
+        }
+
+        function init3DScene(type) {
+            const container = document.getElementById('canvas-container');
+            const oldCanvas = container.querySelector('canvas');
+            if (oldCanvas) container.removeChild(oldCanvas);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(type === 'cricket' ? 0x0c231e : (type === 'football' ? 0x112117 : 0x1a162b));
+            scene.fog = new THREE.FogExp2(scene.background, 0.015);
+
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.insertBefore(renderer.domElement, container.firstChild);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            sunLight.position.set(10, 30, 20);
+            sunLight.castShadow = true;
+            scene.add(sunLight);
+
+            if (type === 'cricket') {
+                setupCricketScene();
+            } else if (type === 'football') {
+                setupFootballScene();
+            } else {
+                setupBasketballScene();
+            }
+
+            animate();
+        }
+
+        // --- CREATING REALISTIC 3D HUMAN CHARACTERS & STADIUM ---
+        function createRealisticHuman(jerseyColor, pantColor) {
+            const group = new THREE.Group();
+
+            const skinMaterial = new THREE.MeshLambertMaterial({ color: 0xffdbac });
+            const clothesMaterial = new THREE.MeshLambertMaterial({ color: jerseyColor });
+            const pantMaterial = new THREE.MeshLambertMaterial({ color: pantColor });
+            const shoeMaterial = new THREE.MeshLambertMaterial({ color: 0x111111 });
+
+            // Head
+            const headGeo = new THREE.SphereGeometry(0.35, 16, 16);
+            const head = new THREE.Mesh(headGeo, skinMaterial);
+            head.position.y = 2.4;
+            head.castShadow = true;
+            group.add(head);
+
+            // Torso / Jersey
+            const torsoGeo = new THREE.CylinderGeometry(0.3, 0.25, 1.1, 16);
+            const torso = new THREE.Mesh(torsoGeo, clothesMaterial);
+            torso.position.y = 1.6;
+            torso.castShadow = true;
+            group.add(torso);
+
+            // Arms
+            const armGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.9, 12);
+            
+            const leftArm = new THREE.Mesh(armGeo, clothesMaterial);
+            leftArm.position.set(-0.45, 1.7, 0);
+            leftArm.rotation.z = 0.2;
+            group.add(leftArm);
+
+            const rightArm = new THREE.Mesh(armGeo, clothesMaterial);
+            rightArm.position.set(0.45, 1.7, 0);
+            rightArm.rotation.z = -0.2;
+            group.add(rightArm);
+
+            // Legs
+            const legGeo = new THREE.CylinderGeometry(0.13, 0.11, 1.0, 12);
+            
+            const leftLeg = new THREE.Mesh(legGeo, pantMaterial);
+            leftLeg.position.set(-0.18, 0.6, 0);
+            group.add(leftLeg);
+
+            const rightLeg = new THREE.Mesh(legGeo, pantMaterial);
+            rightLeg.position.set(0.18, 0.6, 0);
+            group.add(rightLeg);
+
+            return group;
+        }
+
+        function setupCricketScene() {
+            camera.position.set(0, 3.5, 7);
+            camera.lookAt(0, 1.5, -5);
+
+            // Pitch
+            const pitchGeo = new THREE.BoxGeometry(3, 0.05, 22);
+            const pitchMat = new THREE.MeshStandardMaterial({ color: 0xc2a66e, roughness: 0.8 });
+            pitch = new THREE.Mesh(pitchGeo, pitchMat);
+            pitch.position.set(0, 0, -8);
+            scene.add(pitch);
+
+            // Grass field
+            const grassGeo = new THREE.PlaneGeometry(100, 100);
+            const grassMat = new THREE.MeshStandardMaterial({ color: 0x1e5f38, roughness: 0.9 });
+            const grass = new THREE.Mesh(grassGeo, grassMat);
+            grass.rotation.x = -Math.PI / 2;
+            grass.position.y = -0.01;
+            scene.add(grass);
+
+            // Stumps
+            stumps = new THREE.Group();
+            const stumpGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.9);
+            const stumpMat = new THREE.MeshStandardMaterial({ color: 0xd4af37 });
+            for (let i = -0.15; i <= 0.15; i += 0.15) {
+                const s = new THREE.Mesh(stumpGeo, stumpMat);
+                s.position.set(i, 0.45, -17);
+                stumps.add(s);
+            }
+            scene.add(stumps);
+
+            // Batsman (Realistic 3D Human Model)
+            batsman = createRealisticHuman(0x0047ab, 0xffffff); // Blue jersey, white pants
+            batsman.position.set(0.3, 0, -16.5);
+            scene.add(batsman);
+
+            // Bat
+            const batGeo = new THREE.BoxGeometry(0.12, 1.2, 0.05);
+            const batMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
+            bat = new THREE.Mesh(batGeo, batMat);
+            bat.position.set(0.6, 1.6, -16.2);
+            bat.rotation.z = -0.5;
+            scene.add(bat);
+
+            // Ball
+            const ballGeo = new THREE.SphereGeometry(0.12, 16, 16);
+            const ballMat = new THREE.MeshStandardMaterial({ color: 0xcc2200, roughness: 0.4 });
+            ball = new THREE.Mesh(ballGeo, ballMat);
+            resetCricketBall();
+            scene.add(ball);
+
+            document.getElementById('primary-action-btn').innerText = "SWING BAT";
+            document.getElementById('game-status').innerText = "BOWLER RUNNING...";
+            startCricketAction();
+        }
+
+        function resetCricketBall() {
+            ball.position.set(0, 2.5, 5);
+            ballState = 'bowling';
+        }
+
+        function startCricketAction() {
+            resetCricketBall();
+        }
+
+        function triggerAction() {
+            if (currentGame === 'cricket' && ballState === 'bowling') {
+                isPlayingAction = true;
+                // Bat swing animation
+                bat.rotation.x -= 1.2;
+                batsman.rotation.y += 0.3;
+
+                // Check timing
+                if (ball.position.z > -18 && ball.position.z < -15) {
+                    ballState = 'scored';
+                    score += 6;
+                    document.getElementById('game-score').innerText = score;
+                    document.getElementById('game-status').innerText = "SIXER! 🚀";
+                    portalScore += 6;
+                    document.getElementById('portal-score').innerText = portalScore;
+                } else {
+                    ballState = 'missed';
+                    document.getElementById('game-status').innerText = "MISSED! ❌";
+                }
+
+ 
