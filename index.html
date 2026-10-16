@@ -1,0 +1,288 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyArcade Pro 3D - Sports & Racing Gaming Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        skyDark: '#0b1325',
+                        skyCard: 'rgba(15, 23, 42, 0.75)',
+                        skyBlue: '#00b4d8',
+                        skyLight: '#90e0ef',
+                        skyGlow: '#0077b6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070b19;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-card {
+            background: rgba(26, 38, 66, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 180, 216, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 180, 216, 0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 180, 216, 0.3);
+        }
+        .glow-btn {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            box-shadow: 0 0 15px rgba(0, 180, 216, 0.4);
+            transition: all 0.2s ease;
+        }
+        .glow-btn:hover {
+            box-shadow: 0 0 25px rgba(0, 180, 216, 0.8);
+            transform: scale(1.02);
+        }
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-skyBlue/20 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-skyBlue to-skyGlow flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-skyBlue/30">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-skyLight via-skyBlue to-blue-400">SKYARCADE <span class="text-xs px-2 py-0.5 rounded bg-skyBlue/20 text-skyBlue border border-skyBlue/30">PRO 3D</span></h1>
+                    <p class="text-[10px] text-slate-400 font-medium">REALISTIC WEBGL SPORTS PORTAL</p>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="Search 3D sports, racing games..." class="w-full bg-slate-900/80 border border-slate-700/60 rounded-full pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-400 focus:outline-none focus:border-skyBlue transition-colors">
+            </div>
+
+            <!-- Header Controls & Sound Toggle -->
+            <div class="flex items-center gap-3">
+                <button id="soundToggleBtn" onclick="toggleGlobalAudio()" class="px-3 py-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-skyLight border border-slate-700 text-sm flex items-center gap-2">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-skyBlue"></i>
+                    <span class="hidden sm:inline font-medium text-xs">Audio On</span>
+                </button>
+                <div class="px-3 py-1.5 rounded-lg bg-skyBlue/10 border border-skyBlue/30 text-skyLight text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>Portal Score: <strong id="portalScore" class="text-white">0</strong></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex flex-col gap-8">
+
+        <!-- Search & Filter Controls (Mobile / General) -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Category Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0" id="categoryTabs">
+                <button data-cat="all" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-skyBlue text-slate-950 shadow-md">All Games</button>
+                <button data-cat="cricket" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700">Cricket</button>
+                <button data-cat="football" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700">Football</button>
+                <button data-cat="basketball" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700">Basketball</button>
+                <button data-cat="racing" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800/80 text-slate-300 hover:text-white border border-slate-700">Racing</button>
+            </div>
+            <!-- Search for mobile -->
+            <div class="w-full sm:hidden relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="searchInputMobile" placeholder="Search sports games..." class="w-full bg-slate-900 border border-slate-700 rounded-full pl-10 pr-4 py-2 text-sm text-slate-200">
+            </div>
+        </div>
+
+        <!-- Featured Banner Carousel -->
+        <section class="relative rounded-3xl overflow-hidden border border-skyBlue/30 glass-panel shadow-2xl">
+            <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none"></div>
+            <div class="relative z-20 p-6 md:p-10 max-w-2xl flex flex-col items-start gap-4">
+                <span class="px-3 py-1 rounded-full bg-skyBlue/20 text-skyLight border border-skyBlue/40 text-xs font-bold tracking-widest uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-star text-amber-400"></i> Featured Pro Simulator
+                </span>
+                <h2 class="text-2xl md:text-4xl font-black tracking-tight text-white leading-tight">
+                    3D Cricket World Championship
+                </h2>
+                <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                    Experience authentic 22-yard pitch physics! The bowler completes a full run-up from the far stumps, delivering variable length bouncers, yorkers, and swingers straight to your bat.
+                </p>
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <button onclick="launchGame('cricket')" class="glow-btn px-6 py-3 rounded-xl font-bold text-slate-950 flex items-center gap-3 text-sm">
+                        <i class="fa-solid fa-play"></i> Play Cricket Championship
+                    </button>
+                </div>
+            </div>
+            <div class="absolute right-0 top-0 bottom-0 w-1/2 hidden md:block bg-[url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=1200&q=80')] bg-cover bg-center opacity-40 mix-blend-luminosity"></div>
+        </section>
+
+        <!-- Game Cards Grid -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-skyBlue"></i> 3D Sports Games
+                </h3>
+                <span id="gameCountText" class="text-xs text-slate-400">Showing 4 Pro Simulators</span>
+            </div>
+
+            <div id="gamesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 1. Cricket Card -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden flex flex-col" data-title="cricket 3d championship" data-category="cricket">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden group">
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&w=600&q=80')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110 opacity-70"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                        <span class="absolute top-3 left-3 bg-skyBlue text-slate-950 font-bold text-[10px] px-2.5 py-1 rounded-md uppercase">Cricket</span>
+                        <div class="absolute bottom-3 right-3 bg-slate-900/90 text-skyLight border border-skyBlue/30 text-xs px-2 py-1 rounded-md">
+                            Best: <span id="high-cricket">0</span> runs
+                        </div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-white group-hover:text-skyBlue transition-colors">3D Cricket Championship</h4>
+                            <p class="text-slate-400 text-xs mt-1 leading-relaxed">Full 22-yard pitch camera perspective. Bowler run-up from far crease with realistic bounce & pace.</p>
+                        </div>
+                        <button onclick="launchGame('cricket')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-skyBlue hover:text-slate-950 text-skyLight border border-skyBlue/30 font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-gamepad"></i> Launch Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Football Penalty Card -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden flex flex-col" data-title="football penalty shootout 3d soccer" data-category="football">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden group">
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110 opacity-70"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                        <span class="absolute top-3 left-3 bg-emerald-500 text-slate-950 font-bold text-[10px] px-2.5 py-1 rounded-md uppercase">Football</span>
+                        <div class="absolute bottom-3 right-3 bg-slate-900/90 text-skyLight border border-skyBlue/30 text-xs px-2 py-1 rounded-md">
+                            Best: <span id="high-football">0</span> goals
+                        </div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-white transition-colors">3D Football Shootout</h4>
+                            <p class="text-slate-400 text-xs mt-1 leading-relaxed">3D Striker & Goalkeeper AI. Aim target, curve parameters, dynamic keeper diving saves.</p>
+                        </div>
+                        <button onclick="launchGame('football')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-skyBlue hover:text-slate-950 text-skyLight border border-skyBlue/30 font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-futbol"></i> Launch Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Basketball Star Card -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden flex flex-col" data-title="basketball star 3d hoop" data-category="basketball">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden group">
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=80')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110 opacity-70"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                        <span class="absolute top-3 left-3 bg-amber-500 text-slate-950 font-bold text-[10px] px-2.5 py-1 rounded-md uppercase">Basketball</span>
+                        <div class="absolute bottom-3 right-3 bg-slate-900/90 text-skyLight border border-skyBlue/30 text-xs px-2 py-1 rounded-md">
+                            Best: <span id="high-basketball">0</span> pts
+                        </div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-white transition-colors">3D Basketball Star</h4>
+                            <p class="text-slate-400 text-xs mt-1 leading-relaxed">Realistic jump-shot arcs, animated rim swishes, continuous shooting challenges.</p>
+                        </div>
+                        <button onclick="launchGame('basketball')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-skyBlue hover:text-slate-950 text-skyLight border border-skyBlue/30 font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-basketball"></i> Launch Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Asphalt Racing Card -->
+                <div class="game-card glass-card rounded-2xl overflow-hidden flex flex-col" data-title="asphalt street racer 3d car racing track" data-category="racing">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden group">
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80')] bg-cover bg-center transition-transform duration-500 group-hover:scale-110 opacity-70"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                        <span class="absolute top-3 left-3 bg-purple-500 text-slate-950 font-bold text-[10px] px-2.5 py-1 rounded-md uppercase">Racing</span>
+                        <div class="absolute bottom-3 right-3 bg-slate-900/90 text-skyLight border border-skyBlue/30 text-xs px-2 py-1 rounded-md">
+                            Best: <span id="high-racing">0</span> m
+                        </div>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-white transition-colors">3D Asphalt Street Racer</h4>
+                            <p class="text-slate-400 text-xs mt-1 leading-relaxed">High-speed sports car simulator. Steering, nitro boost, highway traffic overtaking.</p>
+                        </div>
+                        <button onclick="launchGame('racing')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-skyBlue hover:text-slate-950 text-skyLight border border-skyBlue/30 font-semibold text-xs transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-car-side"></i> Launch Game
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Game Modal Container -->
+    <div id="gameModal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md flex flex-col">
+        <!-- Modal Top HUD Bar -->
+        <div class="flex items-center justify-between px-6 py-3 bg-slate-900 border-b border-skyBlue/30">
+            <div class="flex items-center gap-3">
+                <span id="modalGameIcon" class="w-8 h-8 rounded-lg bg-skyBlue/20 text-skyBlue flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-gamepad"></i>
+                </span>
+                <div>
+                    <h3 id="modalGameTitle" class="font-bold text-white text-base">Game Title</h3>
+                    <p id="modalGameSub" class="text-[11px] text-slate-400">SkyArcade WebGL Pro Engine</p>
+                </div>
+            </div>
+
+            <!-- In-Game Score Display -->
+            <div id="modalScoreDisplay" class="flex items-center gap-6 text-sm font-bold bg-slate-950 px-4 py-1.5 rounded-xl border border-slate-800">
+                <div id="scoreMetric1">Score: <span class="text-skyBlue">0</span></div>
+                <div id="scoreMetric2">Overs: <span class="text-amber-400">0.0</span></div>
+            </div>
+
+            <!-- Modal Close Button -->
+            <button onclick="closeGameModal()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <!-- WebGL Canvas Container -->
+        <div class="relative flex-1 bg-slate-950 overflow-hidden flex items-center justify-center" id="canvasContainer">
+            <canvas id="webglCanvas" class="w-full h-full block"></canvas>
+
+            <!-- Game Overlay Commentary / Message Box -->
+            <div id="gameCommentary" class="absolute top-6 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-300 opacity-0 transform -translate-y-4">
+                <div class="bg-slate-900/90 border border-skyBlue/50 text-skyLight font-bold px-6 py-2.5 rounded-full text-sm sm:text-base shadow-2xl flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-skyBlue"></i>
+                    <span id="commentaryText">Ready to Play!</span>
+                </div>
+            </div>
+
+            <!-- Game Controls Instructions Layer -->
+            <div id="gameInstructionOverlay" class="absolute bottom-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:max-w-xl bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 text-xs text-slate-300 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-center justify-between gap-3">
+                <div id="instructionText" class="flex items-center g
